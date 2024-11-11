@@ -26,12 +26,13 @@ class Seeder
       description TEXT NOT NULL,
       date_created INTEGER NOT NULL,
       date_expire INTEGER,
-      status INTEGER NOT NULL
+      status INTEGER DEFAULT "0" NOT NULL
     )')
   end
 
   def self.populate_tables
-    db.execute('INSERT INTO todo (todo_id, id, label, description, date_created, date_expire, status) VALUES (1, 1, "Köpa Ägg", "12 pack stora ägg, rabatt på ICA", 20241104, 20241105, 0 )')
+    db.execute('INSERT INTO todo (todo_id, id, label, description, date_created, date_expire) VALUES (1, 1, "Köpa Ägg", "12 pack stora ägg, rabatt på ICA", 20241104, 20241105 )')
+    db.execute('INSERT INTO todo (todo_id, id, label, description, date_created, date_expire, status) VALUES (2, 2, "Smeka Vincent", "SKOJAR BARA!!", 20241104, 20241105, 0 )')
 
   end
 

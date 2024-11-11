@@ -1,0 +1,10 @@
+<blockquote>¨
+    <link rel="stylesheet" type="text/css" href="/style.css?<%=Time.now.to_i%>">
+    <h1>Skapa en ny uppgift</h1>
+    <form action="/todo" method="post">
+    <label>Namn: <input type="text" name="todo_label"></label><br>
+    <label>Beskrivning: <input type="text" name="todo_description"></label><br>
+    <label>Utgångsdatum: <input type="date" name="todo_expire_date"></label><br>
+    <input type="submit" value="Save Todo">
+    </form>
+</blockquote>

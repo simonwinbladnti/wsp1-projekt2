@@ -7,6 +7,18 @@
     <link rel="stylesheet" type="text/css" href="/style.css?<%=Time.now.to_i%>">
 </head>
 <body>
-  <h1>Välkommen <%=%><h1>
+  <h1>Mina listor</h1>
+  <button onclick="window.location.href='/todo/create'">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" width="16" height="16">
+        <path fill="#ffffff"d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 144L48 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l144 0 0 144c0 17.7 14.3 32 32 32s32-14.3 32-32l0-144 144 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-144 0 0-144z"/>
+    </svg>
+  </button>
+  <ul>
+    <% @todos.each do |todo| %>
+      <li><a href="/todos/<%= todo['id']%>"><%= todo['label'] %></a>
+      <p> <%= todo['description'] %> - Utgår: <%= (todo['date_expire'] - todo['date_created']).to_i %> dagar</p>
+      </li>
+    <% end %>
+  </ul>
 </body>
 </html>
