@@ -34,7 +34,6 @@ class App < Sinatra::Base
             session[:user_id] = user['id']
             redirect '/todo'
         else
-            print('ajwdjadjd')
             @error = "Invalid username or password"
             erb :login
         end
