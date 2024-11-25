@@ -1,4 +1,5 @@
 require 'date'
+require 'bcrypt'
 
 class App < Sinatra::Base
 
@@ -11,8 +12,42 @@ class App < Sinatra::Base
         return @db
     end
 
+    def logged_in?
+        session[:user_id]
+    end
+
+    def current_user
+    @current_user ||= db.execute("SELECT * FROM users WHERE id = ?", session[:user_id]).first if logged_in?
+    end
+
+    get '/login' do
+    erb :login
+    end
+    
+    post '/login' do
+        username = params[:username]
+        password = params[:password]
+
+        user = db.execute("SELECT * FROM users WHERE username = ?", username).first
+
+        if user && BCrypt::Password.new(user['password']) == password
+            session[:user_id] = user['id']
+            redirect '/todo'
+        else
+            print('ajwdjadjd')
+            @error = "Invalid username or password"
+            erb :login
+        end
+    end
+
+    get '/logout' do
+    session.clear
+    redirect '/login'
+    end
+
     get '/' do
-        redirect('/todo')
+    redirect('/login') unless logged_in?
+    redirect('/todo')
     end
 
     get '/todo' do

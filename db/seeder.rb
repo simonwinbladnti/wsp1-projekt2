@@ -1,4 +1,6 @@
 require 'sqlite3'
+require 'bcrypt'
+
 
 class Seeder
   
@@ -33,7 +35,9 @@ class Seeder
   def self.populate_tables
     db.execute('INSERT INTO todo (todo_id, id, label, description, date_created, date_expire) VALUES (1, 1, "Köpa Ägg", "12 pack stora ägg, rabatt på ICA", 20241104, 20241105 )')
     db.execute('INSERT INTO todo (todo_id, id, label, description, date_created, date_expire, status) VALUES (2, 2, "Smeka Vincent", "SKOJAR BARA!!", 20241104, 20241105, 0 )')
-
+    password_hashed = BCrypt::Password.create("admin")
+    p "Storing hashed version of password to db. Clear text never saved. #{password_hashed}"
+    db.execute('INSERT INTO users (username, password) VALUES (?, ?)', ["admin", password_hashed])
   end
 
   private
