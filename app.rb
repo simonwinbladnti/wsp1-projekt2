@@ -1,5 +1,6 @@
 require 'date'
 require 'bcrypt'
+require 'securerandom'
 
 class App < Sinatra::Base
 
@@ -12,16 +13,25 @@ class App < Sinatra::Base
         return @db
     end
 
+    configure do
+        enable :sessions
+        set :session_secret, SecureRandom.hex(64)
+    end
+
     def logged_in?
         session[:user_id]
     end
 
+    def admin?
+        current_user && current_user['username'] == 'admin'
+    end
+
     def current_user
-    @current_user ||= db.execute("SELECT * FROM users WHERE id = ?", session[:user_id]).first if logged_in?
+        @current_user ||= db.execute("SELECT * FROM users WHERE id = ?", session[:user_id]).first if logged_in?
     end
 
     get '/login' do
-    erb :login
+        erb :login
     end
     
     post '/login' do
@@ -32,7 +42,7 @@ class App < Sinatra::Base
 
         if user && BCrypt::Password.new(user['password']) == password
             session[:user_id] = user['id']
-            redirect '/todo'
+            redirect '/todos'
         else
             @error = "Invalid username or password"
             erb :login
@@ -40,25 +50,57 @@ class App < Sinatra::Base
     end
 
     get '/logout' do
-    session.clear
-    redirect '/login'
+        session.clear
+        redirect '/login'
     end
 
     get '/' do
-    redirect('/login') unless logged_in?
-    redirect('/todo')
+        redirect('/login') unless logged_in?
+        redirect('/todos')
     end
 
-    get '/todo' do
-        @todos = db.execute('SELECT * FROM todo')
+    get '/todos' do
+        redirect('/login') unless logged_in?
+        p(session[:user_id],session[:user_id],session[:user_id],session[:user_id],session[:user_id])
+        @todos = db.execute('SELECT * FROM todo WHERE id = ?', session[:user_id])
         erb(:"index")
     end 
 
-    get '/todo/create' do 
+    get '/admin' do
+        redirect('/login') unless logged_in?
+        redirect('/todos') unless admin? 
+
+        @users = db.execute('SELECT * FROM users')
+        erb(:"admin")
+    end 
+
+    get '/admin/users/create' do
+        redirect('/login') unless logged_in?
+        redirect('/todos') unless admin?
+
+        erb(:"create_user")
+    end
+
+    post '/admin/users' do
+        redirect('/login') unless logged_in?
+        redirect('/todos') unless admin?
+
+        username = params[:username]
+        password = params[:password]
+
+        password_hashed = BCrypt::Password.create(password)
+
+        db.execute('INSERT INTO users (username, password) VALUES (?, ?)', [username, password_hashed])
+
+        redirect '/admin'
+    end
+
+    get '/todos/create' do 
+        redirect('/login') unless logged_in?
         erb(:"create")
     end
 
-    post '/todo' do
+    post '/todos' do
 
         name = params[:todo_label]
         description = params[:todo_description]
@@ -67,9 +109,9 @@ class App < Sinatra::Base
         today = Date.today
         todaydate = today.strftime("%Y%m%d").to_i
         # SQL Insert
-        db.execute("INSERT INTO todo (id, label, description, date_created, date_expire) VALUES(?,?,?,?,?)", [1, name, description, todaydate, expiredate ])
+        db.execute("INSERT INTO todo (id, label, description, date_created, date_expire) VALUES(?,?,?,?,?)", [session[:user_id], name, description, todaydate, expiredate ])
         
-        redirect('/todo')
+        redirect('/todos')
     end
 
 end
