@@ -20,9 +20,9 @@ p {
 }
 
 button {
-  background-color: #000000;
+  background-color: #373737;
   border: none;
-  color: #000;
+  color: #ffffff;
   padding: 10px 20px;
   font-size: 16px;
   cursor: pointer;
@@ -113,6 +113,32 @@ input[type="submit"] {
 
 input[type="submit"]:hover {
   background-color: #aaa;
+}
+
+.complete {
+  background-color: rgb(185, 255, 185) !important;
+}
+
+.finishButton {
+  background-color: transparent !important;
+  color: black !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: none !important;
+  margin: 0;
+  max-width: none !important;
+}
+
+.finishButton input[type="submit"] {
+  width: 100% !important;
+  background-color: #373737;
+  color: #fff;
+}
+
+.buttonDiv {
+  display: flex;
+  align-items: center;
+  width: 100%;
 }
 
 

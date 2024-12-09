@@ -63,7 +63,7 @@ class App < Sinatra::Base
         redirect('/login') unless logged_in?
         p(session[:user_id],session[:user_id],session[:user_id],session[:user_id],session[:user_id])
         @todos = db.execute('SELECT * FROM todo WHERE id = ?', session[:user_id])
-        erb(:"index")
+        erb(:"todos/index")
     end 
 
     get '/admin' do
@@ -97,7 +97,7 @@ class App < Sinatra::Base
 
     get '/todos/create' do 
         redirect('/login') unless logged_in?
-        erb(:"create")
+        erb(:"todos/create")
     end
 
     post '/todos' do
@@ -114,4 +114,33 @@ class App < Sinatra::Base
         redirect('/todos')
     end
 
+    post '/todos/:id/complete' do |id|
+        current_status = db.execute('SELECT status FROM todo WHERE todo_id = ?', id).first['status']
+      
+        new_status = current_status == 1 ? 0 : 1
+      
+        db.execute('UPDATE todo SET status = ? WHERE todo_id = ?', [new_status, id])
+      
+        redirect '/todos'
+    end
+
+    post '/todos/:id/delete' do |id|
+        @fruit = db.execute('DELETE FROM todo WHERE todo_id=?', id)
+      
+        redirect '/todos'
+    end
+
+    get '/todos/:id/edit' do
+        @id = params[:id]  
+        erb:"todos/edit"
+    end
+
+    post '/todos/:id/update' do | id |
+        name = params[:todo_name]
+        description = params[:todo_description]
+
+        db.execute('UPDATE todo SET description = ?, label = ? WHERE todo_id = ?', [description, name, id])
+
+        redirect('/todos')
+    end
 end
